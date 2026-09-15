@@ -17,3 +17,7 @@ want SMS/email reminders. Flask + SQLite backend, plain HTML/CSS/JS frontend.
 - Optional daily or when needed reminder digests by SMS and/or email, opt-in per signed-in
   Google account, for plants that are overdue.
 - Bluebell-branded landing page with a video hero above the tracker.
+
+## Overview
+
+![App overview](docs/overview.gif)
