@@ -1,4 +1,6 @@
-<center>![Bluebell logo](static/bluebell-logo-smaller.png)</center>
+<p align="center">
+  <img src="static/bluebell-logo-smaller.png" alt="Bluebell logo" width="300">
+</p>
 
 # Keep Your Plants Alive
 
