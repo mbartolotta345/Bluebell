@@ -1,0 +1,17 @@
+venv/
+__pycache__/
+*.pyc
+.env
+plants.db
+
+# Raw design source files - already processed into optimized assets in static/
+1.svg
+Bluebell Wallpaper.png
+Bluebell Favicon.png
+Bluebell Logo.svg
+bluebell logo smaller.png
+background v4.png
+Flora (1).png
+bluebell wallpaper v5.png
+FACTS ABOUT BLUEBELLS & STUNNING VIEWS OF BLUEBELL FIELDS 4K UHD.mp4
+Jost,Solway/

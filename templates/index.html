@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keep your plants alive</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Solway:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <section class="landing">
+    <video class="landing-video" autoplay muted loop playsinline>
+      <source src="{{ url_for('static', filename='bluebell-facts.mp4') }}" type="video/mp4" />
+    </video>
+
+    <div class="topbar-wrap">
+      <div class="topbar">
+        <a href="{{ url_for('index') }}" class="navbar-logo-link">
+          <img src="{{ url_for('static', filename='bluebell-logo-smaller.png') }}" alt="Bluebell logo - back to home" class="navbar-logo" />
+        </a>
+        <a href="#add-plant-section" class="btn-start-free">Start free &rarr;</a>
+      </div>
+    </div>
+
+    <div class="landing-content">
+      <h1>Give your plants the care they deserve</h1>
+      <p class="landing-subtext">Track watering schedules, get smart reminders, and keep every plant thriving - all in one place.</p>
+    </div>
+  </section>
+
+  <main>
+    <section class="card form-card" id="add-plant-section">
+      <div class="page-intro">
+        <h2>Keep your plants alive</h2>
+        <p class="subheading">Individual care schedule and reminders for your plants, input your plants now!</p>
+      </div>
+      <h2>Add a plant</h2>
+      <form id="add-plant-form">
+        <div class="field">
+          <label for="plant-name">Name</label>
+          <input type="text" id="plant-name" name="name" required />
+        </div>
+
+        <div class="field">
+          <label for="plant-species">Species</label>
+          <input type="text" id="plant-species" name="species" required />
+        </div>
+
+        <div class="field">
+          <label for="plant-last-watered">Last watered</label>
+          <input type="date" id="plant-last-watered" name="last_watered_at" required />
+        </div>
+
+        <!-- "Look up a care schedule suggestion" (Google Custom Search-backed) is
+             temporarily disabled pending Google Cloud billing setup. To re-enable,
+             restore the checkbox and ai-status/ai-explanation-block markup here,
+             and the corresponding JS block in static/app.js. -->
+
+        <div class="field">
+          <label for="plant-frequency">Watering frequency (days)</label>
+          <input type="number" id="plant-frequency" name="watering_frequency_days" min="1" step="1" required />
+        </div>
+
+        <div class="field">
+          <label for="plant-sunlight">Sunlight needs</label>
+          <input type="text" id="plant-sunlight" name="sunlight_needs" required />
+        </div>
+
+        <div class="field">
+          <label for="plant-notes">Notes (optional)</label>
+          <textarea id="plant-notes" name="notes" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save plant</button>
+      </form>
+    </section>
+
+    <section class="card" id="report-section">
+      <h2>Your plants</h2>
+      <div id="plants-list" class="plants-list">
+        <p class="empty-state" id="empty-state">No plants yet - add one above!</p>
+      </div>
+    </section>
+
+    <section class="card contact-card" id="contact-section">
+      <h2>Reminders (optional)</h2>
+      <p class="contact-note">
+        This step is entirely optional. Fill in a phone number and/or email only if
+        you'd like daily reminders when your plants are thirsty.
+      </p>
+      <form id="contact-form">
+        <div class="field">
+          <label for="contact-phone">Phone number</label>
+          <input type="tel" id="contact-phone" name="phone_number" placeholder="Optional" />
+        </div>
+        <div class="field">
+          <label for="contact-email">Email</label>
+          <input type="email" id="contact-email" name="email" placeholder="Optional" />
+        </div>
+        <button type="submit" class="btn btn-secondary">Save contact info</button>
+        <span id="contact-status" class="contact-status"></span>
+      </form>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
