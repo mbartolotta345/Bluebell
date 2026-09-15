@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Solway:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <section class="landing">
@@ -21,13 +22,14 @@
         <a href="{{ url_for('index') }}" class="navbar-logo-link">
           <img src="{{ url_for('static', filename='bluebell-logo-smaller.png') }}" alt="Bluebell logo - back to home" class="navbar-logo" />
         </a>
-        <a href="#add-plant-section" class="btn-start-free">Start free &rarr;</a>
+        <a href="#login-section" class="btn-start-free">Start free &rarr;</a>
       </div>
     </div>
 
     <div class="landing-content">
       <h1>Give your plants the care they deserve</h1>
       <p class="landing-subtext">Track watering schedules, get smart reminders, and keep every plant thriving - all in one place.</p>
+      <a href="#login-section" class="btn-start-free landing-cta">Start tracking plants</a>
     </div>
   </section>
 
@@ -88,10 +90,31 @@
     <section class="card contact-card" id="contact-section">
       <h2>Reminders (optional)</h2>
       <p class="contact-note">
-        This step is entirely optional. Fill in a phone number and/or email only if
-        you'd like daily reminders when your plants are thirsty.
+        This step is entirely optional, and requires signing in with Google so we
+        know where to send your reminders. The plant tracker above works fine
+        without ever signing in.
       </p>
-      <form id="contact-form">
+
+      <div id="login-prompt">
+        <div id="g_id_onload"
+             data-client_id="{{ google_client_id }}"
+             data-callback="handleGoogleCredential"
+             data-auto_prompt="false"></div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="signin_with"
+             data-shape="pill"
+             data-logo_alignment="left"></div>
+      </div>
+
+      <div id="user-info" hidden>
+        <p class="contact-note">Signed in as <strong id="user-email"></strong></p>
+        <button type="button" class="btn-small" id="logout-btn">Log out</button>
+      </div>
+
+      <form id="contact-form" hidden>
         <div class="field">
           <label for="contact-phone">Phone number</label>
           <input type="tel" id="contact-phone" name="phone_number" placeholder="Optional" />

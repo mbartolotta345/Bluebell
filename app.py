@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
@@ -6,6 +7,7 @@ from flask import Flask, render_template
 load_dotenv()
 
 from models import db  # noqa: E402
+from routes.auth import auth_bp  # noqa: E402
 from routes.contact import contact_bp  # noqa: E402
 from routes.plants import plants_bp  # noqa: E402
 
@@ -19,9 +21,11 @@ def create_app():
         "DATABASE_URL", f"sqlite:///{DB_PATH}"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
     db.init_app(app)
 
+    app.register_blueprint(auth_bp)
     app.register_blueprint(plants_bp)
     app.register_blueprint(contact_bp)
 
@@ -30,7 +34,10 @@ def create_app():
 
     @app.route("/")
     def index():
-        return render_template("index.html")
+        return render_template(
+            "index.html",
+            google_client_id=os.environ.get("GOOGLE_OAUTH_CLIENT_ID", ""),
+        )
 
     return app
 

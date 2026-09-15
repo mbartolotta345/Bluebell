@@ -4,6 +4,9 @@ const API = {
   water: (id) => `/plants/${id}/water`,
   aiSuggest: "/plants/ai-suggest",
   contact: "/contact",
+  googleLogin: "/auth/google",
+  logout: "/auth/logout",
+  me: "/auth/me",
 };
 
 function formatDate(dateStr) {
@@ -252,7 +255,66 @@ contactForm.addEventListener("submit", async (e) => {
   }
 });
 
+/* ---------- Auth ----------
+   The plant tracker (add/view/edit/water plants) works for everyone,
+   logged in or not. Only the Reminders section - which needs to know
+   who to contact - requires signing in with Google. */
+
+const loginPrompt = document.getElementById("login-prompt");
+const userInfo = document.getElementById("user-info");
+const userEmailEl = document.getElementById("user-email");
+const logoutBtn = document.getElementById("logout-btn");
+const contactFormEl = document.getElementById("contact-form");
+
+function showLoggedIn(user) {
+  loginPrompt.hidden = true;
+  userInfo.hidden = false;
+  contactFormEl.hidden = false;
+  userEmailEl.textContent = user.email;
+  loadContact();
+}
+
+function showLoggedOut() {
+  loginPrompt.hidden = false;
+  userInfo.hidden = true;
+  contactFormEl.hidden = true;
+}
+
+async function checkAuth() {
+  try {
+    const result = await apiRequest(API.me);
+    if (result.logged_in) {
+      showLoggedIn(result);
+    } else {
+      showLoggedOut();
+    }
+  } catch (err) {
+    showLoggedOut();
+  }
+}
+
+window.handleGoogleCredential = async (response) => {
+  try {
+    const user = await apiRequest(API.googleLogin, {
+      method: "POST",
+      body: JSON.stringify({ credential: response.credential }),
+    });
+    showLoggedIn(user);
+  } catch (err) {
+    alert(`Could not log in: ${err.message}`);
+  }
+};
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await apiRequest(API.logout, { method: "POST" });
+  } catch (err) {
+    // ignore - clear the UI regardless
+  }
+  showLoggedOut();
+});
+
 /* ---------- Init ---------- */
 
 loadPlants();
-loadContact();
+checkAuth();

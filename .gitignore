@@ -11,7 +11,12 @@ Bluebell Favicon.png
 Bluebell Logo.svg
 bluebell logo smaller.png
 background v4.png
+background v6.png
 Flora (1).png
 bluebell wallpaper v5.png
+bluebell wallpaper v6.png
 FACTS ABOUT BLUEBELLS & STUNNING VIEWS OF BLUEBELL FIELDS 4K UHD.mp4
 Jost,Solway/
+
+# Google OAuth client secret download - contains a real secret, never commit
+client_secret_*.json
