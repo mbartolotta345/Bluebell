@@ -1,4 +1,4 @@
-![Bluebell logo](static/bluebell-logo-smaller.png)
+<center>![Bluebell logo](static/bluebell-logo-smaller.png)</center>
 
 # Keep Your Plants Alive
 
