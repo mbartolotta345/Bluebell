@@ -11,16 +11,20 @@ reminders. Flask + SQLite backend, plain HTML/CSS/JS frontend.
 ## Features
 
 - Add plants with a name, species, watering frequency, sunlight needs, and
-  notes; edit or remove them inline. There's no manual "mark watered"
-  button - the schedule assumes each plant gets watered on the day it's
-  due and rolls forward automatically, so it always shows the current
-  due date rather than piling up as overdue.
-- The report view flags any plant that's due for watering today and shows
-  its exact next-due date.
+  notes.
+- Use autofill from houseplant species database to input your plant's needs with sources attatched.
+- The report view flags any plant that's currently overdue for watering and
+  shows its exact next-due date.
 - Optional daily or when needed reminder digests by SMS and/or email, opt-in per signed-in
   Google account, for plants that are due.
 - Bluebell-branded landing page with a video hero above the tracker.
 
-## Overview
+## Demo
 
 ![App overview](docs/overview.gif)
+
+## Future Iterations
+- Add Api Google Custom Search to find best plant websites to reccommend plant needs and source attatchment instead of database.
+- Fertilizer tracking
+- Photo Tracking
+- Custom schedules and linking to Google Calendar
