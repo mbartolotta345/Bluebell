@@ -198,6 +198,49 @@ main {
   gap: 6px;
 }
 
+.species-autocomplete {
+  position: relative;
+}
+
+.species-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 4px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(18, 86, 98, 0.12);
+}
+
+.species-dropdown li {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.species-dropdown li:hover {
+  background: #f2f8f2;
+}
+
+.species-dropdown-common {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.species-dropdown-scientific {
+  display: block;
+  font-size: 12px;
+  font-style: italic;
+  color: #a3aca5;
+  margin-top: 2px;
+}
+
 .field label {
   font-weight: 600;
   font-size: 14px;
@@ -298,14 +341,40 @@ textarea:focus {
 }
 
 .species-info.open {
-  max-height: 220px;
+  max-height: 600px;
   opacity: 1;
   padding: 14px 40px 14px 14px;
 }
 
+.species-info-scientific-name {
+  margin: 0 0 6px;
+  color: #5a6b5c;
+  font-style: italic;
+  font-size: 13px;
+}
+
 .species-info-summary {
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+
+.species-info-toggle {
+  display: inline-block;
+  margin-bottom: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.species-info-long {
   margin: 0 0 10px;
   color: var(--ink);
+  font-size: 13px;
 }
 
 .species-info-link {

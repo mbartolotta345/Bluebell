@@ -69,18 +69,24 @@ class SpeciesGuide(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
+    scientific_name = db.Column(db.Text, nullable=True)
     watering_frequency_days = db.Column(db.Integer, nullable=False)
     sunlight_needs = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
+    long_description = db.Column(db.Text, nullable=True)
+    source_name = db.Column(db.Text, nullable=True)
     source_url = db.Column(db.Text, nullable=False)
 
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
+            "scientific_name": self.scientific_name,
             "watering_frequency_days": self.watering_frequency_days,
             "sunlight_needs": self.sunlight_needs,
             "description": self.description,
+            "long_description": self.long_description,
+            "source_name": self.source_name,
             "source_url": self.source_url,
         }
 
@@ -100,21 +106,6 @@ class ContactSettings(db.Model):
             "phone_number": self.phone_number,
             "email": self.email,
             "updated_at": self.updated_at.isoformat(),
-        }
-
-
-class WateringLog(db.Model):
-    __tablename__ = "watering_log"
-
-    id = db.Column(db.Integer, primary_key=True)
-    plant_id = db.Column(db.Integer, db.ForeignKey("plants.id"), nullable=False)
-    watered_at = db.Column(db.DateTime, nullable=False, default=utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "plant_id": self.plant_id,
-            "watered_at": self.watered_at.isoformat(),
         }
 
 

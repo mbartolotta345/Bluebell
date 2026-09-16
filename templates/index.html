@@ -46,16 +46,19 @@
           <input type="text" id="plant-name" name="name" required />
         </div>
 
-        <div class="field">
+        <div class="field species-autocomplete">
           <label for="plant-species">Species</label>
-          <input type="text" id="plant-species" name="species" list="species-options" autocomplete="off" required />
-          <datalist id="species-options"></datalist>
+          <input type="text" id="plant-species" name="species" autocomplete="off" required />
+          <ul class="species-dropdown" id="species-dropdown" hidden></ul>
         </div>
 
         <div class="species-info" id="species-info" hidden>
           <button type="button" class="species-info-close" id="species-info-close" aria-label="Close">&times;</button>
+          <p class="species-info-scientific-name" id="species-info-scientific-name"></p>
           <p class="species-info-summary" id="species-info-summary"></p>
-          <a class="species-info-link" id="species-info-link" href="#" target="_blank" rel="noopener noreferrer">View source</a>
+          <button type="button" class="species-info-toggle" id="species-info-toggle">More details</button>
+          <p class="species-info-long" id="species-info-long" hidden></p>
+          <a class="species-info-link" id="species-info-link" href="#" target="_blank" rel="noopener noreferrer"></a>
           <label class="checkbox-field">
             <input type="checkbox" id="fill-suggested-checkbox" />
             Fill suggested amounts for watering and sunlight

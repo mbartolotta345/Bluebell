@@ -2,9 +2,9 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
-from models import NotificationsLog, Plant, WateringLog, db
+from models import Plant, db
 from services.ai_lookup import AiLookupError, get_care_suggestion
-from utils import next_due_date, plant_with_schedule, utcnow_naive
+from utils import plant_with_schedule
 
 plants_bp = Blueprint("plants", __name__)
 
@@ -57,13 +57,16 @@ def _validate_plant_payload(data, partial=False):
 @plants_bp.route("/plants", methods=["GET"])
 def list_plants():
     plants = Plant.query.filter_by(active=True).order_by(Plant.created_at.desc()).all()
-    return jsonify([plant_with_schedule(p) for p in plants])
+    result = [plant_with_schedule(p) for p in plants]
+    db.session.commit()
+    return jsonify(result)
 
 
 @plants_bp.route("/plants/thirsty", methods=["GET"])
 def list_thirsty_plants():
     plants = Plant.query.filter_by(active=True).all()
     result = [plant_with_schedule(p) for p in plants]
+    db.session.commit()
     thirsty = [p for p in result if p["is_thirsty"]]
     return jsonify(thirsty)
 
@@ -71,18 +74,9 @@ def list_thirsty_plants():
 @plants_bp.route("/plants/<int:plant_id>", methods=["GET"])
 def get_plant(plant_id):
     plant = Plant.query.get_or_404(plant_id)
-    return jsonify(plant_with_schedule(plant))
-
-
-@plants_bp.route("/plants/<int:plant_id>/history", methods=["GET"])
-def get_plant_history(plant_id):
-    Plant.query.get_or_404(plant_id)
-    logs = (
-        WateringLog.query.filter_by(plant_id=plant_id)
-        .order_by(WateringLog.watered_at.desc())
-        .all()
-    )
-    return jsonify([log.to_dict() for log in logs])
+    result = plant_with_schedule(plant)
+    db.session.commit()
+    return jsonify(result)
 
 
 @plants_bp.route("/plants", methods=["POST"])
@@ -104,8 +98,10 @@ def create_plant():
         notes=data.get("notes"),
     )
     db.session.add(plant)
+    db.session.flush()
+    result = plant_with_schedule(plant)
     db.session.commit()
-    return jsonify(plant_with_schedule(plant)), 201
+    return jsonify(result), 201
 
 
 @plants_bp.route("/plants/<int:plant_id>", methods=["PUT"])
@@ -135,8 +131,9 @@ def update_plant(plant_id):
     if "notes" in data:
         plant.notes = data["notes"]
 
+    result = plant_with_schedule(plant)
     db.session.commit()
-    return jsonify(plant_with_schedule(plant))
+    return jsonify(result)
 
 
 @plants_bp.route("/plants/<int:plant_id>", methods=["DELETE"])
@@ -145,16 +142,6 @@ def delete_plant(plant_id):
     plant.active = False
     db.session.commit()
     return jsonify({"success": True})
-
-
-@plants_bp.route("/plants/<int:plant_id>/water", methods=["POST"])
-def water_plant(plant_id):
-    plant = Plant.query.get_or_404(plant_id)
-    now = utcnow_naive()
-    plant.last_watered_at = now
-    db.session.add(WateringLog(plant_id=plant.id, watered_at=now))
-    db.session.commit()
-    return jsonify(plant_with_schedule(plant))
 
 
 @plants_bp.route("/plants/ai-suggest", methods=["POST"])

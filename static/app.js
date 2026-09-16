@@ -1,7 +1,6 @@
 const API = {
   plants: "/plants",
   plant: (id) => `/plants/${id}`,
-  water: (id) => `/plants/${id}/water`,
   species: "/species",
   contact: "/contact",
   googleLogin: "/auth/google",
@@ -39,9 +38,12 @@ async function apiRequest(url, options = {}) {
 
 const addForm = document.getElementById("add-plant-form");
 const speciesInput = document.getElementById("plant-species");
-const speciesOptionsEl = document.getElementById("species-options");
+const speciesDropdownEl = document.getElementById("species-dropdown");
 const speciesInfoEl = document.getElementById("species-info");
+const speciesInfoScientificNameEl = document.getElementById("species-info-scientific-name");
 const speciesInfoSummaryEl = document.getElementById("species-info-summary");
+const speciesInfoToggleBtn = document.getElementById("species-info-toggle");
+const speciesInfoLongEl = document.getElementById("species-info-long");
 const speciesInfoLinkEl = document.getElementById("species-info-link");
 const speciesInfoCloseBtn = document.getElementById("species-info-close");
 const fillSuggestedCheckbox = document.getElementById("fill-suggested-checkbox");
@@ -56,12 +58,56 @@ async function loadSpeciesGuide() {
     speciesGuide = await apiRequest(API.species);
   } catch (err) {
     speciesGuide = [];
+  }
+}
+
+const MAX_SPECIES_SUGGESTIONS = 4;
+
+function renderSpeciesDropdown(matches) {
+  if (matches.length === 0) {
+    hideSpeciesDropdown();
     return;
   }
-  speciesOptionsEl.innerHTML = speciesGuide
-    .map((s) => `<option value="${escapeHtml(s.name)}"></option>`)
+  speciesDropdownEl.innerHTML = matches
+    .map(
+      (s, i) => `
+        <li data-index="${i}" role="option">
+          <span class="species-dropdown-common">${escapeHtml(s.name)}</span>
+          ${
+            s.scientific_name
+              ? `<span class="species-dropdown-scientific">${escapeHtml(s.scientific_name)}</span>`
+              : ""
+          }
+        </li>
+      `
+    )
     .join("");
+  speciesDropdownEl.hidden = false;
 }
+
+function hideSpeciesDropdown() {
+  speciesDropdownEl.hidden = true;
+  speciesDropdownEl.innerHTML = "";
+}
+
+let currentMatches = [];
+
+speciesDropdownEl.addEventListener("click", (e) => {
+  const li = e.target.closest("li[data-index]");
+  if (!li) return;
+  const species = currentMatches[Number(li.dataset.index)];
+  if (!species) return;
+
+  speciesInput.value = species.name;
+  hideSpeciesDropdown();
+  showSpeciesInfo(species);
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".species-autocomplete")) {
+    hideSpeciesDropdown();
+  }
+});
 
 function fillSuggestedValues(species) {
   frequencyInput.value = species.watering_frequency_days;
@@ -70,8 +116,20 @@ function fillSuggestedValues(species) {
 
 function showSpeciesInfo(species) {
   selectedSpecies = species;
+  speciesInfoScientificNameEl.textContent = species.scientific_name || "";
+  speciesInfoScientificNameEl.hidden = !species.scientific_name;
   speciesInfoSummaryEl.textContent = species.description;
+
+  speciesInfoLongEl.textContent = species.long_description || "";
+  speciesInfoLongEl.hidden = true;
+  speciesInfoToggleBtn.textContent = "More details";
+  speciesInfoToggleBtn.hidden = !species.long_description;
+
   speciesInfoLinkEl.href = species.source_url;
+  speciesInfoLinkEl.textContent = species.source_name
+    ? `Source: ${species.source_name}`
+    : "View source";
+
   speciesInfoEl.hidden = false;
   // Two rAFs so the browser registers the starting (collapsed) state
   // before the class flips - otherwise the transition doesn't play.
@@ -90,14 +148,27 @@ function hideSpeciesInfo() {
   }, 400);
 }
 
+speciesInfoToggleBtn.addEventListener("click", () => {
+  const nowHidden = !speciesInfoLongEl.hidden;
+  speciesInfoLongEl.hidden = nowHidden;
+  speciesInfoToggleBtn.textContent = nowHidden ? "More details" : "Less details";
+});
+
 speciesInput.addEventListener("input", () => {
+  // Typing (as opposed to clicking a suggestion) always means manual
+  // entry from here - hide any open info panel and re-filter suggestions.
+  hideSpeciesInfo();
+
   const typed = speciesInput.value.trim().toLowerCase();
-  const match = speciesGuide.find((s) => s.name.toLowerCase() === typed);
-  if (match) {
-    showSpeciesInfo(match);
-  } else {
-    hideSpeciesInfo();
+  if (!typed) {
+    hideSpeciesDropdown();
+    return;
   }
+
+  currentMatches = speciesGuide
+    .filter((s) => s.name.toLowerCase().includes(typed))
+    .slice(0, MAX_SPECIES_SUGGESTIONS);
+  renderSpeciesDropdown(currentMatches);
 });
 
 speciesInfoCloseBtn.addEventListener("click", hideSpeciesInfo);
@@ -165,7 +236,6 @@ function plantCardHtml(plant) {
       </div>
       ${plant.notes ? `<div class="plant-notes">${escapeHtml(plant.notes)}</div>` : ""}
       <div class="plant-actions">
-        <button class="btn-small water" data-action="water" data-id="${plant.id}">Mark watered</button>
         <button class="btn-small" data-action="edit" data-id="${plant.id}">Edit</button>
         <button class="btn-small danger" data-action="remove" data-id="${plant.id}">Remove</button>
       </div>
@@ -238,14 +308,7 @@ plantsList.addEventListener("click", async (e) => {
   if (!btn) return;
   const { action, id } = btn.dataset;
 
-  if (action === "water") {
-    try {
-      await apiRequest(API.water(id), { method: "POST" });
-      loadPlants();
-    } catch (err) {
-      alert(`Could not mark watered: ${err.message}`);
-    }
-  } else if (action === "remove") {
+  if (action === "remove") {
     if (!confirm("Remove this plant?")) return;
     try {
       await apiRequest(API.plant(id), { method: "DELETE" });
