@@ -6,10 +6,12 @@ from flask import Flask, render_template
 
 load_dotenv()
 
-from models import db  # noqa: E402
+from models import SpeciesGuide, db  # noqa: E402
 from routes.auth import auth_bp  # noqa: E402
 from routes.contact import contact_bp  # noqa: E402
 from routes.plants import plants_bp  # noqa: E402
+from routes.species import species_bp  # noqa: E402
+from species_data import seed_species  # noqa: E402
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, "plants.db")
@@ -28,9 +30,11 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(plants_bp)
     app.register_blueprint(contact_bp)
+    app.register_blueprint(species_bp)
 
     with app.app_context():
         db.create_all()
+        seed_species(db, SpeciesGuide)
 
     @app.route("/")
     def index():

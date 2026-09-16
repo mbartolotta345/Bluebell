@@ -204,7 +204,7 @@ main {
   color: var(--brand);
 }
 
-.checkbox-field label {
+label.checkbox-field {
   flex-direction: row;
   display: flex;
   align-items: center;
@@ -283,23 +283,58 @@ textarea:focus {
   border-color: #b7d6da;
 }
 
-.ai-status {
-  font-size: 13px;
-  color: var(--brand);
-  margin-bottom: 12px;
-}
-
-.ai-explanation {
+.species-info {
+  position: relative;
   background: #f2f8f2;
   border: 1px solid var(--card-border);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 14px 40px 4px 14px;
   margin-bottom: 16px;
   font-size: 14px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease, margin 0.4s ease;
 }
 
-.ai-explanation a {
+.species-info.open {
+  max-height: 220px;
+  opacity: 1;
+  padding: 14px 40px 14px 14px;
+}
+
+.species-info-summary {
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+
+.species-info-link {
+  display: inline-block;
+  margin-bottom: 12px;
   color: var(--brand);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.species-info-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: #6b7a6d;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.species-info-close:hover {
+  color: var(--ink);
+}
+
+.species-info .checkbox-field {
+  margin: 0;
 }
 
 .plants-list {

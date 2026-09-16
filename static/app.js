@@ -2,7 +2,7 @@ const API = {
   plants: "/plants",
   plant: (id) => `/plants/${id}`,
   water: (id) => `/plants/${id}/water`,
-  aiSuggest: "/plants/ai-suggest",
+  species: "/species",
   contact: "/contact",
   googleLogin: "/auth/google",
   logout: "/auth/logout",
@@ -38,14 +38,80 @@ async function apiRequest(url, options = {}) {
 /* ---------- Add plant form ---------- */
 
 const addForm = document.getElementById("add-plant-form");
+const speciesInput = document.getElementById("plant-species");
+const speciesOptionsEl = document.getElementById("species-options");
+const speciesInfoEl = document.getElementById("species-info");
+const speciesInfoSummaryEl = document.getElementById("species-info-summary");
+const speciesInfoLinkEl = document.getElementById("species-info-link");
+const speciesInfoCloseBtn = document.getElementById("species-info-close");
+const fillSuggestedCheckbox = document.getElementById("fill-suggested-checkbox");
+const frequencyInput = document.getElementById("plant-frequency");
+const sunlightInput = document.getElementById("plant-sunlight");
 
-// The "Look up a care schedule suggestion" (Google Custom Search-backed)
-// feature is temporarily disabled - see templates/index.html for the note
-// on re-enabling it. Fields below are always filled in manually for now.
+let speciesGuide = [];
+let selectedSpecies = null;
+
+async function loadSpeciesGuide() {
+  try {
+    speciesGuide = await apiRequest(API.species);
+  } catch (err) {
+    speciesGuide = [];
+    return;
+  }
+  speciesOptionsEl.innerHTML = speciesGuide
+    .map((s) => `<option value="${escapeHtml(s.name)}"></option>`)
+    .join("");
+}
+
+function fillSuggestedValues(species) {
+  frequencyInput.value = species.watering_frequency_days;
+  sunlightInput.value = species.sunlight_needs;
+}
+
+function showSpeciesInfo(species) {
+  selectedSpecies = species;
+  speciesInfoSummaryEl.textContent = species.description;
+  speciesInfoLinkEl.href = species.source_url;
+  speciesInfoEl.hidden = false;
+  // Two rAFs so the browser registers the starting (collapsed) state
+  // before the class flips - otherwise the transition doesn't play.
+  requestAnimationFrame(() => requestAnimationFrame(() => speciesInfoEl.classList.add("open")));
+
+  if (fillSuggestedCheckbox.checked) {
+    fillSuggestedValues(species);
+  }
+}
+
+function hideSpeciesInfo() {
+  selectedSpecies = null;
+  speciesInfoEl.classList.remove("open");
+  setTimeout(() => {
+    if (!speciesInfoEl.classList.contains("open")) speciesInfoEl.hidden = true;
+  }, 400);
+}
+
+speciesInput.addEventListener("input", () => {
+  const typed = speciesInput.value.trim().toLowerCase();
+  const match = speciesGuide.find((s) => s.name.toLowerCase() === typed);
+  if (match) {
+    showSpeciesInfo(match);
+  } else {
+    hideSpeciesInfo();
+  }
+});
+
+speciesInfoCloseBtn.addEventListener("click", hideSpeciesInfo);
+
+fillSuggestedCheckbox.addEventListener("change", () => {
+  if (fillSuggestedCheckbox.checked && selectedSpecies) {
+    fillSuggestedValues(selectedSpecies);
+  }
+});
 
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(addForm);
+  const usedSuggestion = Boolean(selectedSpecies) && fillSuggestedCheckbox.checked;
 
   const payload = {
     name: formData.get("name").trim(),
@@ -54,7 +120,9 @@ addForm.addEventListener("submit", async (e) => {
     watering_frequency_days: Number(formData.get("watering_frequency_days")),
     sunlight_needs: formData.get("sunlight_needs").trim(),
     notes: formData.get("notes")?.trim() || null,
-    used_ai_suggestion: false,
+    used_ai_suggestion: usedSuggestion,
+    ai_explanation: usedSuggestion ? selectedSpecies.description : null,
+    ai_sources: usedSuggestion ? [selectedSpecies.source_url] : [],
   };
 
   try {
@@ -63,6 +131,8 @@ addForm.addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
     addForm.reset();
+    hideSpeciesInfo();
+    fillSuggestedCheckbox.checked = false;
     loadPlants();
   } catch (err) {
     alert(`Could not save plant: ${err.message}`);
@@ -317,4 +387,5 @@ logoutBtn.addEventListener("click", async () => {
 /* ---------- Init ---------- */
 
 loadPlants();
+loadSpeciesGuide();
 checkAuth();

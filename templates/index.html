@@ -48,18 +48,24 @@
 
         <div class="field">
           <label for="plant-species">Species</label>
-          <input type="text" id="plant-species" name="species" required />
+          <input type="text" id="plant-species" name="species" list="species-options" autocomplete="off" required />
+          <datalist id="species-options"></datalist>
+        </div>
+
+        <div class="species-info" id="species-info" hidden>
+          <button type="button" class="species-info-close" id="species-info-close" aria-label="Close">&times;</button>
+          <p class="species-info-summary" id="species-info-summary"></p>
+          <a class="species-info-link" id="species-info-link" href="#" target="_blank" rel="noopener noreferrer">View source</a>
+          <label class="checkbox-field">
+            <input type="checkbox" id="fill-suggested-checkbox" />
+            Fill suggested amounts for watering and sunlight
+          </label>
         </div>
 
         <div class="field">
           <label for="plant-last-watered">Last watered</label>
           <input type="date" id="plant-last-watered" name="last_watered_at" required />
         </div>
-
-        <!-- "Look up a care schedule suggestion" (Google Custom Search-backed) is
-             temporarily disabled pending Google Cloud billing setup. To re-enable,
-             restore the checkbox and ai-status/ai-explanation-block markup here,
-             and the corresponding JS block in static/app.js. -->
 
         <div class="field">
           <label for="plant-frequency">Watering frequency (days)</label>

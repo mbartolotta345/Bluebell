@@ -60,6 +60,31 @@ class Plant(db.Model):
         }
 
 
+class SpeciesGuide(db.Model):
+    """A small built-in reference table of popular houseplants, used to
+    auto-suggest watering frequency / sunlight needs when a user picks a
+    species from the dropdown - no external API required."""
+
+    __tablename__ = "species_guide"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False, unique=True)
+    watering_frequency_days = db.Column(db.Integer, nullable=False)
+    sunlight_needs = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    source_url = db.Column(db.Text, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "watering_frequency_days": self.watering_frequency_days,
+            "sunlight_needs": self.sunlight_needs,
+            "description": self.description,
+            "source_url": self.source_url,
+        }
+
+
 class ContactSettings(db.Model):
     __tablename__ = "contact_settings"
 
