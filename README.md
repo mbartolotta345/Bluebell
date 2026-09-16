@@ -18,6 +18,6 @@ want SMS/email reminders. Flask + SQLite backend, plain HTML/CSS/JS frontend.
   Google account, for plants that are overdue.
 - Bluebell-branded landing page with a video hero above the tracker.
 
-## Overview
+## Demo
 
 ![App overview](docs/overview.gif)
